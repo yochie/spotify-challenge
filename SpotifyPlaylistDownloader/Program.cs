@@ -2,6 +2,7 @@
 using SpotifyPlaylistDownloader;
 using Microsoft.Extensions.Configuration;
 using System.Text.Json.Nodes;
+using Newtonsoft.Json.Linq;
 
 internal class Program
 {
@@ -16,7 +17,7 @@ internal class Program
         IAuthenticationProvider authentifier = new SpotifyClientCredentialAuthentifier(settings.AuthAPIAddress,
                                                                                        settings.ClientID,
                                                                                        settings.Secret);
-        ISpotifyClient client = new SpotifyClient(authentifier);
+        ISpotifyClient client = new SpotifyClient(authentifier, settings.DataAPIAddress);
         IDataOutputter outputter = new StringDataOutputter();
         ICommandHandler commandHandler = new CommandHandler(client, outputter);
         await commandHandler.Handle(args);
@@ -35,7 +36,7 @@ internal interface IDataOutputter
 
 internal interface ISpotifyClient
 {
-    public Task<JsonObject> GetPlaylist(string id);
+    public Task<JObject> GetPlaylist(string id);
 }
 
 internal sealed class Settings {
@@ -48,4 +49,9 @@ internal sealed class Settings {
 internal interface IAuthenticationProvider
 {
     public Task<string> GetAccessToken();
+}
+
+internal interface IApiClient
+{
+    public Task<JObject> GetData(HttpRequestMessage request); 
 }

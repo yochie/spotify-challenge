@@ -1,20 +1,44 @@
 // See https://aka.ms/new-console-template for more information
+using System.Net;
 using System.Text.Json.Nodes;
+using Newtonsoft.Json.Linq;
 
 internal class SpotifyClient : ISpotifyClient
 {
-    private IAuthenticationProvider authentifier;
+    private readonly IAuthenticationProvider authentifier;
+    private readonly Uri endpoint;
+    private static readonly HttpClient httpClient;
 
-    public SpotifyClient(IAuthenticationProvider authentifier)
-    {
-        this.authentifier = authentifier;
+    static SpotifyClient(){
+
+        SocketsHttpHandler SocketsHandler = new()
+        {
+            PooledConnectionLifetime = TimeSpan.FromMinutes(2)
+        };
+        httpClient = new HttpClient(SocketsHandler);
     }
 
-    public async Task<JsonObject> GetPlaylist(string id)
+    public SpotifyClient(IAuthenticationProvider authentifier, string endpointUri)
     {
-        
+        this.authentifier = authentifier;
+        this.endpoint = new Uri(endpointUri);
+    }
+
+    public async Task<JObject> GetPlaylist(string id)
+    {
         string accessToken = await authentifier.GetAccessToken();
-        // Console.WriteLine(accessToken);        
-        throw new NotImplementedException();
+        var msg = new HttpRequestMessage();
+        msg.Headers.Add("Authorization", "Bearer " + accessToken);
+        msg.Method = HttpMethod.Get;
+        msg.RequestUri = new Uri(endpoint, $"playlists/{id}");
+        msg.Headers.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+        var response = await httpClient.SendAsync(msg);
+
+        if (response.StatusCode != HttpStatusCode.OK){
+            throw new Exception($"Couldn't request playlist data. Q: {msg.RequestUri}\n status : {response.StatusCode}");
+        }
+        var rawJsonResponse = await response.Content.ReadAsStringAsync();
+        JObject json = JObject.Parse(rawJsonResponse);
+        return json;
     }
 }

@@ -4,8 +4,12 @@ namespace SpotifyPlaylistDownloader;
 
 public class SpotifyClientCredentialAuthentifier : IAuthenticationProvider
 {
-    public static readonly HttpClient authClient;
+    // dont change state (base url, etc) for this singleton since that can have impacts on other clients
+    // kind of dumb that there is no way to prevent access to state, but what are ya gonna do... singletons
+    // potential solutin would be to wrap in proxy that provides only access to request method or use DI along with IHttpClientFactory
+    private static readonly HttpClient authClient;
 
+    private readonly Uri endPoint;
     private Dictionary<string, string> formData = new();
     private AuthenticationToken? token;
 
@@ -20,14 +24,15 @@ public class SpotifyClientCredentialAuthentifier : IAuthenticationProvider
         authClient = new HttpClient(SocketsHandler);
     }
 
-    public SpotifyClientCredentialAuthentifier(string authAPIAddress, string clientID, string secret)
+    public SpotifyClientCredentialAuthentifier(string endpoint, string clientID, string secret)
     {
-        authClient.BaseAddress = new Uri(authAPIAddress);
+        endPoint = new Uri(endpoint);
         formData["grant_type"] = "client_credentials";
         formData["client_id"] = clientID;
         formData["client_secret"] = secret;
         this.token = null;
     }
+
 
     //returns valid access token
     //will fetch new one if none gotten yet or expired
@@ -41,7 +46,7 @@ public class SpotifyClientCredentialAuthentifier : IAuthenticationProvider
 
     private async Task<AuthenticationToken> RequestNewAuthToken()
     {
-        HttpResponseMessage response = await authClient.PostAsync("token", new FormUrlEncodedContent(formData));
+        HttpResponseMessage response = await authClient.PostAsync(endPoint, new FormUrlEncodedContent(formData));
         if (response.StatusCode != HttpStatusCode.OK){
             throw new Exception($"Couldn't request authentication from API. Status : {response.StatusCode}");
         }

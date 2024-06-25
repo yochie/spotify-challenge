@@ -12,7 +12,12 @@ internal class CommandHandler : ICommandHandler
 
     public async Task Handle(string[] args)
     {
-        await this.client.GetPlaylist("p");
-        throw new NotImplementedException();
+        if (args.Length == 0)
+        {
+            Console.WriteLine("Provide a playlist ID.");
+            return;
+        }   
+        var result = await this.client.GetPlaylist(args[0]);
+        Console.WriteLine(result);
     }
 }
