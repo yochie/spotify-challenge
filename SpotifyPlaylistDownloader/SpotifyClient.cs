@@ -10,8 +10,11 @@ internal class SpotifyClient : ISpotifyClient
         this.authentifier = authentifier;
     }
 
-    public JsonObject GetPlaylist(string id)
+    public async Task<JsonObject> GetPlaylist(string id)
     {
+        
+        string accessToken = await authentifier.GetAccessToken();
+        // Console.WriteLine(accessToken);        
         throw new NotImplementedException();
     }
 }

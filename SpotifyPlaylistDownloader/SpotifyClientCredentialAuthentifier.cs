@@ -7,7 +7,10 @@ public class SpotifyClientCredentialAuthentifier : IAuthenticationProvider
     public static readonly HttpClient authClient;
 
     private Dictionary<string, string> formData = new();
+    private AuthenticationToken? token;
 
+    //Creates a singleton HttpClient to be shared by all authentication clients
+    //sets socket timeout to avoid DNS remapping issues if long running
     static SpotifyClientCredentialAuthentifier(){
 
         SocketsHttpHandler SocketsHandler = new()
@@ -23,17 +26,32 @@ public class SpotifyClientCredentialAuthentifier : IAuthenticationProvider
         formData["grant_type"] = "client_credentials";
         formData["client_id"] = clientID;
         formData["client_secret"] = secret;
+        this.token = null;
     }
 
-    public async Task<string> Authenticate(){
+    //returns valid access token
+    //will fetch new one if none gotten yet or expired
+    public async Task<string> GetAccessToken(){
 
+        if (token == null || token.Expired){
+            token = await RequestNewAuthToken();
+        }
+        return token.AccessToken;
+    }
+
+    private async Task<AuthenticationToken> RequestNewAuthToken()
+    {
         HttpResponseMessage response = await authClient.PostAsync("token", new FormUrlEncodedContent(formData));
         if (response.StatusCode != HttpStatusCode.OK){
             throw new Exception($"Couldn't request authentication from API. Status : {response.StatusCode}");
         }
         var rawJsonResponse = await response.Content.ReadAsStringAsync();
         JObject json = JObject.Parse(rawJsonResponse);
-        string? token = (string?) json["access_token"];
-        return token == null ? throw new Exception("no access token returned") : token;
+        string? accessToken = (string?) json["access_token"];
+        int? tokenSeconds = (int?) json["expires_in"];
+        if (accessToken == null || tokenSeconds == null){
+            throw new Exception("Couldn't parse authentication response");
+        }
+        return new AuthenticationToken(accessToken, (int)tokenSeconds);
     }
 }

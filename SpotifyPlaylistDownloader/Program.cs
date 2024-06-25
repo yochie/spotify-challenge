@@ -5,7 +5,7 @@ using System.Text.Json.Nodes;
 
 internal class Program
 {
-
+    //args should consist of playlist id
     private static async Task Main(string[] args)
     {
         IConfigurationRoot config = new ConfigurationBuilder()
@@ -18,7 +18,8 @@ internal class Program
                                                                                        settings.Secret);
         ISpotifyClient client = new SpotifyClient(authentifier);
         IDataOutputter outputter = new StringDataOutputter();
-        await new CommandHandler(client, outputter).Handle(args);
+        ICommandHandler commandHandler = new CommandHandler(client, outputter);
+        await commandHandler.Handle(args);
     }
 }
 
@@ -34,7 +35,7 @@ internal interface IDataOutputter
 
 internal interface ISpotifyClient
 {
-    public JsonObject GetPlaylist(string id);
+    public Task<JsonObject> GetPlaylist(string id);
 }
 
 internal sealed class Settings {
@@ -46,5 +47,5 @@ internal sealed class Settings {
 
 internal interface IAuthenticationProvider
 {
-    public Task<string> Authenticate();
+    public Task<string> GetAccessToken();
 }

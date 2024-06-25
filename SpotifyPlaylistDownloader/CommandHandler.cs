@@ -10,8 +10,9 @@ internal class CommandHandler : ICommandHandler
         this.outputter = outputter;
     }
 
-    public Task Handle(string[] args)
+    public async Task Handle(string[] args)
     {
+        await this.client.GetPlaylist("p");
         throw new NotImplementedException();
     }
 }
