@@ -25,7 +25,7 @@ internal class SpotifyClient : ISpotifyClient
         this.endpoint = new Uri(endpointUri);
     }
 
-    public async Task<JObject> GetPlaylist(string id, string fieldQuery = "")
+    public async Task<JObject> GetPlaylist(string id, string fieldQuery = "fields=tracks.items(track(name,artists(name),album(name)))")
     {
         string accessToken = await authentifier.GetAccessToken();
         var msg = new HttpRequestMessage();
@@ -34,10 +34,6 @@ internal class SpotifyClient : ISpotifyClient
         UriBuilder uriBuilder = new(endpoint);
         uriBuilder.Path += $"playlists/{id}";
         uriBuilder.Query = fieldQuery;
-        // {
-        //     Path = Path.Combine($"playlists/{id}"),
-        //     Query = fieldQuery
-        // };
         msg.RequestUri = uriBuilder.Uri;
         msg.Headers.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
         var response = await httpClient.SendAsync(msg);
