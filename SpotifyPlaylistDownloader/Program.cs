@@ -6,7 +6,7 @@ using Newtonsoft.Json.Linq;
 
 internal class Program
 {
-    //args should consist of playlist id
+    //args should consist of playlist id optionaly followed by query string
     private static async Task Main(string[] args)
     {
         IConfigurationRoot config = new ConfigurationBuilder()
@@ -31,12 +31,12 @@ internal interface ICommandHandler
 
 internal interface IDataOutputter
 {
-    public void OutputData(JsonObject data);
+    public void OutputData(JObject data);
 }
 
 internal interface ISpotifyClient
 {
-    public Task<JObject> GetPlaylist(string id);
+    public Task<JObject> GetPlaylist(string playlistID, string fieldQuery = "");
 }
 
 internal sealed class Settings {

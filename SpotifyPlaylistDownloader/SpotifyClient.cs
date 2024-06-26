@@ -1,6 +1,7 @@
 // See https://aka.ms/new-console-template for more information
 using System.Net;
 using System.Text.Json.Nodes;
+using System.Web;
 using Newtonsoft.Json.Linq;
 
 internal class SpotifyClient : ISpotifyClient
@@ -24,13 +25,20 @@ internal class SpotifyClient : ISpotifyClient
         this.endpoint = new Uri(endpointUri);
     }
 
-    public async Task<JObject> GetPlaylist(string id)
+    public async Task<JObject> GetPlaylist(string id, string fieldQuery = "")
     {
         string accessToken = await authentifier.GetAccessToken();
         var msg = new HttpRequestMessage();
         msg.Headers.Add("Authorization", "Bearer " + accessToken);
         msg.Method = HttpMethod.Get;
-        msg.RequestUri = new Uri(endpoint, $"playlists/{id}");
+        UriBuilder uriBuilder = new(endpoint);
+        uriBuilder.Path += $"playlists/{id}";
+        uriBuilder.Query = fieldQuery;
+        // {
+        //     Path = Path.Combine($"playlists/{id}"),
+        //     Query = fieldQuery
+        // };
+        msg.RequestUri = uriBuilder.Uri;
         msg.Headers.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
         var response = await httpClient.SendAsync(msg);
 
