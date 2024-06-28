@@ -20,13 +20,11 @@ internal class CommandHandler : ICommandHandler
             Console.WriteLine("Provide a playlist ID.");
             return;
         }
-        JObject result;
+        string result;
         if (args.Length == 1) 
             result = await this.client.GetPlaylist(args[0]);
-        else if (args.Length == 2)
-            result = await this.client.GetPlaylist(args[0], args[1]);
         else 
             throw new ArgumentException("invalid input");
-        Console.WriteLine(result);
+        outputter.OutputData(result);
     }
 }

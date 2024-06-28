@@ -25,8 +25,9 @@ internal class SpotifyClient : ISpotifyClient
         this.endpoint = new Uri(endpointUri);
     }
 
-    public async Task<JObject> GetPlaylist(string id, string fieldQuery = "fields=tracks.items(track(name,artists(name),album(name)))")
+    public async Task<string> GetPlaylist(string id)
     {
+        string fieldQuery = "fields=tracks.items(track(name,artists(name),album(name)))";
         string accessToken = await authentifier.GetAccessToken();
         var msg = new HttpRequestMessage();
         msg.Headers.Add("Authorization", "Bearer " + accessToken);
@@ -41,8 +42,8 @@ internal class SpotifyClient : ISpotifyClient
         if (response.StatusCode != HttpStatusCode.OK){
             throw new Exception($"Couldn't request playlist data. Q: {msg.RequestUri}\n status : {response.StatusCode}");
         }
-        var rawJsonResponse = await response.Content.ReadAsStringAsync();
-        JObject json = JObject.Parse(rawJsonResponse);
-        return json;
+        return await response.Content.ReadAsStringAsync();
+        // JObject json = JObject.Parse(rawJsonResponse);
+        // return json;
     }
 }

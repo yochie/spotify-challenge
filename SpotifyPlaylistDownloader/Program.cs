@@ -18,11 +18,18 @@ internal class Program
                                                                                        settings.ClientID,
                                                                                        settings.Secret);
         ISpotifyClient client = new SpotifyClient(authentifier, settings.DataAPIAddress);
-        IDataOutputter outputter = new StringDataOutputter();
+        IDataOutputter outputter;
+        if (settings.OutputFilePath == null){
+            outputter = new ConsoleOutputter();
+        } else {
+            IJsonParser<TrackData> parser = new TrackDataParser();
+            outputter = new FileOutputter<TrackData>(settings.OutputFilePath, parser);
+        }
         ICommandHandler commandHandler = new CommandHandler(client, outputter);
         await commandHandler.Handle(args);
     }
 }
+
 
 internal interface ICommandHandler
 {
@@ -31,19 +38,12 @@ internal interface ICommandHandler
 
 internal interface IDataOutputter
 {
-    public void OutputData(JObject data);
+    public void OutputData(string data);
 }
 
 internal interface ISpotifyClient
 {
-    public Task<JObject> GetPlaylist(string playlistID, string fieldQuery = "");
-}
-
-internal sealed class Settings {
-    public required string AuthAPIAddress { get; set; }
-    public required string ClientID { get; set;}
-    public required string Secret { get; set;}
-    public required string DataAPIAddress { get; set;}
+    public Task<string> GetPlaylist(string playlistID);
 }
 
 internal interface IAuthenticationProvider
@@ -51,7 +51,10 @@ internal interface IAuthenticationProvider
     public Task<string> GetAccessToken();
 }
 
-internal interface IApiClient
-{
-    public Task<JObject> GetData(HttpRequestMessage request); 
+internal sealed class Settings {
+    public required string AuthAPIAddress { get; set; }
+    public required string ClientID { get; set;}
+    public required string Secret { get; set;}
+    public required string DataAPIAddress { get; set;}
+    public string? OutputFilePath { get; set; }
 }

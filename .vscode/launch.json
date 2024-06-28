@@ -10,7 +10,7 @@
             "request": "launch",
             "preLaunchTask": "build",
             "program": "${workspaceFolder}/SpotifyPlaylistDownloader/bin/Debug/net8.0/SpotifyPlaylistDownloader.dll",
-            "args": ["018RxtBqJl7yGh81LCo4aI", "fields=tracks.items(track(name,artists(name),album(name)))"],
+            "args": ["018RxtBqJl7yGh81LCo4aI"],
             "cwd": "${workspaceFolder}/SpotifyPlaylistDownloader/",
             "stopAtEntry": false,
             "console": "internalConsole"
