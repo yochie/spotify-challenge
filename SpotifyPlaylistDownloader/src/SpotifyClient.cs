@@ -4,6 +4,8 @@ using System.Text.Json.Nodes;
 using System.Web;
 using Newtonsoft.Json.Linq;
 
+//Handles requests for playlists
+//Returns raw Json
 internal class SpotifyClient : ISpotifyClient
 {
     private readonly IAuthenticationProvider authentifier;

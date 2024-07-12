@@ -9,9 +9,9 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/SpotifyPlaylistDownloader/bin/Debug/net8.0/SpotifyPlaylistDownloader.dll",
+            "program": "${workspaceFolder}/bin/Debug/net8.0/SpotifyPlaylistDownloader.dll",
             "args": ["018RxtBqJl7yGh81LCo4aI"],
-            "cwd": "${workspaceFolder}/SpotifyPlaylistDownloader/",
+            "cwd": "${workspaceFolder}",
             "stopAtEntry": false,
             "console": "internalConsole"
         }

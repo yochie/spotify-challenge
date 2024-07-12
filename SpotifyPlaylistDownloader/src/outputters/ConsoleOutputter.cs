@@ -10,8 +10,6 @@ internal class ConsoleOutputter : IDataOutputter
 
     public void OutputData(string data)
     {
-        foreach (var item in data){
-            Console.WriteLine(item);
-        }
+        Console.WriteLine(data);
     }
 }

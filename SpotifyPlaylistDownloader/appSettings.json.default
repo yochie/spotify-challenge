@@ -1,3 +1,5 @@
+//This is a template for the actual config
+//you should remove this comment, fill in the empty fields and rename to appSettings.json
 {
     "Settings": {
         "AuthAPIAddress": "https://accounts.spotify.com/api/",

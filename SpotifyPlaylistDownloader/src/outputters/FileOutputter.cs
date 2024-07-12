@@ -32,8 +32,3 @@ internal class FileOutputter<RecordT> : IDataOutputter
         }
     }
 }
-
-internal interface IJsonParser<RecordT>
-{
-    internal IEnumerable<RecordT> Parse(string data);
-}
